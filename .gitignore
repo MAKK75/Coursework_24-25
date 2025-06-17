@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.idea/
+.vscode/
+
+# Docker
+docker_results/
+
+# Проект ResNet-BERT
+resnet_bert_inference/docker_results/
+resnet_bert_inference/resnet18.onnx
+resnet_bert_inference/resnet18_tf/
+resnet_bert_inference/bert_model.onnx
+resnet_bert_inference/bert_tf_savedmodel/
+resnet_bert_inference/bert_model_fp32.tflite
+resnet_bert_inference/bert_model_fp16.tflite
+resnet_bert_inference/*.png
+
+# Проект SmolLM
+smollm_inference_pipeline/smollm_local_model/
+smollm_inference_pipeline/docker_results/
+smollm_inference_pipeline/*.onnx
+smollm_inference_pipeline/*.tflite
+smollm_inference_pipeline/*_tf_savedmodel/
+smollm_inference_pipeline/*.png
