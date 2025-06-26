@@ -20,7 +20,7 @@ MODEL_PATH = './smollm_local_model'
 ONNX_PATH = 'smollm_135m.simplified.onnx' 
 TFLITE_FP32_PATH = 'smollm_135m_fp32.tflite'
 TFLITE_FP16_PATH = 'smollm_135m_fp16.tflite'
-MODEL_NAME_FOR_PLOT = 'SmolLM-135M'
+MODEL_NAME_FOR_PLOT = 'smollm'
 DEVICE = torch.device('cpu')
 REPEATS = 20
 PLOT_FILENAME = 'inference_times_smollm_comparison.png'
@@ -286,3 +286,8 @@ if __name__ == '__main__':
         "TFLite FP16": (tflite_fp16_mean, tflite_fp16_std)
     }
     plot_inference_times(results_for_plot)
+    
+    print("\nСохранение эталонного выхода PyTorch...")
+    os.makedirs('./pytorch_outputs', exist_ok=True) 
+    np.save(f'./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy', torch_out) 
+    print(f"Эталонный выход сохранен в ./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy")
