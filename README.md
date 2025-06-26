@@ -130,10 +130,10 @@ Model-quantization-benchmark/
 
 ## Итоговые результаты
 
-После выполнения всех шагов в папке `openvino_inference/docker_results/` вы найдете:
-*   Полный набор IR-моделей в трех вариантах точности: **FP32**, **FP16** и **INT8**.
-*   Три итоговых графика, которые наглядно демонстрируют компромисс между скоростью выполнения и потерей точности для каждой модели.
-
+![Таблица для Resnet-18](table_resnet18.png)
 ![График для Resnet-18](summary_performance_resnet.png)
+![Таблица для BERT](table_bert.png)
 ![График для BERT](summary_performance_bert.png)
+![Таблица для SmolLM-135M](table_smollm.png)
 ![График для SmolLM-135M](summary_performance_smollm.png)
+
