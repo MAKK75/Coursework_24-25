@@ -27,13 +27,14 @@
 
 2.  **Скопируйте эталонные выходы PyTorch** в `./data/pytorch_outputs/`:
     ```bash
-    cp ../resnet_bert_inference/docker_results/pytorch_outputs/*.npy ./data/pytorch_outputs/
-    cp ../smollm_inference_pipeline/docker_results/pytorch_outputs/*.npy ./data/pytorch_outputs/
+    cp ../resnet_bert_inference/docker_results/pytorch_outputs/torch_output_resnet.npy ./data/pytorch_outputs/
+    cp ../resnet_bert_inference/docker_results/pytorch_outputs/torch_output_bert.npy ./data/pytorch_outputs/
+    cp ../smollm_inference/docker_results/pytorch_outputs/*.npy ./data/pytorch_outputs/
     ```
 
 3.  **Скопируйте токенизатор SmolLM** в `./models/`:
     ```bash
-    cp -r ../smollm_inference_pipeline/smollm_local_model/ ./models/
+    cp -r ../smollm_inference/smollm_local_model/ ./models/
     ```
 
 После этого шага папка `openvino_inference` полностью готова к сборке Docker-образа.
