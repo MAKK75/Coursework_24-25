@@ -14,13 +14,13 @@
 1.  **Клонируйте репозиторий:**
     Откройте терминал или командную строку и выполните:
     ```bash
-    git clone https://github.com/MAKK75/Coursework_24-25.git
+    git clone https://github.com/MAKK75/Model-quantization-benchmark.git
     ```
 
 2.  **Перейдите в папку проекта:**
     После клонирования перейдите в директорию, где находится `Dockerfile` и скрипты:
     ```bash
-    cd Coursework_24-25/resnet_bert_inference
+    cd Model-quantization-benchmark/resnet_bert_inference
     ```
     *Все последующие команды должны выполняться из этой директории (`Coursework_24-25/resnet_bert_inference`)*.
 
@@ -62,20 +62,23 @@
         docker cp $ID:/app/bert_model_fp16.tflite ./docker_results/
         docker cp $ID:/app/inference_times_bert_comparison.png ./docker_results/
 
+        echo "Копирование эталонных выходов PyTorch..."
+        docker cp $ID:/app/pytorch_outputs ./docker_results/
+
         docker rm -v $ID
-        echo "Все файлы скопированы в папку ./docker_results (внутри Coursework_24-25/resnet_bert_inference)"
+        echo "Все файлы скопированы в папку ./docker_results (внутри Model-quantization-benchmark/resnet_bert_inference)"
         ```
-    После выполнения этих команд, вы найдете все указанные файлы и папки в директории `Coursework_24-25/resnet_bert_inference/docker_results` на вашем компьютере.
+    После выполнения этих команд, вы найдете все указанные файлы и папки в директории `Model-quantization-benchmark/resnet_bert_inference/docker_results` на вашем компьютере.
 
 ## Структура проекта (внутри `resnet_bert_inference`)
 
 *   `Dockerfile`: Определяет процесс сборки Docker-образа.
 *   `requirements.txt`: Список Python-зависимостей.
 *   `resnet_onnx_1.py`: Скрипт для конвертации ResNet18.
-*   `compare_resnet_inference_1.py`: Скрипт для сравнения производительности ResNet18.
+*   `compare_resnet_inference_1.py`: Скрипт для сравнения производительности ResNet18 и сохранения эталонного выхода.
 *   `bert_onnx_1.py`: Скрипт для конвертации BERT в ONNX.
 *   `bert_tflite_1.py`: Скрипт для конвертации BERT в TFLite.
-*   `compare_bert_inference_1.py`: Скрипт для сравнения производительности BERT.
+*   `compare_bert_inference_1.py`: Скрипт для сравнения производительности BERT и сохранения эталонного выхода.
 
 ## Примечание
 Все модели загружаются и обрабатываются с использованием CPU.
@@ -90,7 +93,7 @@
 
 ![График сравнения скорости для CNN](inference_times_resnet_comparison.png)
 
-### 2. Модель BERT (Max Seq Length: 16)
+### 2. Модель BERT (Max Seq Length: 128)
 
 Сравнение производительности на CPU при 20 повторениях с максимальной длиной последовательности 16.
 
