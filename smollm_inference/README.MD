@@ -41,12 +41,12 @@ smollm_inference_pipeline/
 
 1.  **Клонируйте репозиторий (если еще не сделали):**
     ```bash
-    git clone https://github.com/MAKK75/Coursework_24-25.git
+    git clone https://github.com/MAKK75/Model-quantization-benchmark.git
     ```
 
 2.  **Перейдите в папку проекта:**
     ```bash
-    cd Coursework_24-25/smollm_inference_pipeline
+    cd Model-quantization-benchmark/smollm_inference_pipeline
     ```
     *Все последующие команды выполняются из этой директории.*
 
@@ -78,6 +78,9 @@ smollm_inference_pipeline/
     docker cp $ID:/app/smollm_135m_fp32.tflite ./docker_results/
     docker cp $ID:/app/smollm_135m_fp16.tflite ./docker_results/
     docker cp $ID:/app/inference_times_smollm_comparison.png ./docker_results/
+
+    echo "Копирование эталонных выходов PyTorch..."
+    docker cp $ID:/app/pytorch_outputs ./docker_results/
 
     docker rm -v $ID
     echo "Все файлы скопированы в папку ./docker_results"
