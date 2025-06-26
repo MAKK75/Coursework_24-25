@@ -21,7 +21,8 @@ TFLITE_FP32_PATH = 'resnet18_tf/resnet18_float32.tflite'
 TFLITE_FP16_PATH = 'resnet18_tf/resnet18_float16.tflite'
 DEVICE = torch.device('cpu')
 REPEATS = 30
-DUMMY_INPUT_SHAPE = (1, 3, 224, 224) # NCHW
+DUMMY_INPUT_SHAPE = (1, 3, 224, 224) 
+MODEL_NAME_FOR_PLOT = 'resnet'
 PLOT_FILENAME = 'inference_times_resnet_comparison.png' 
 
 dummy_image_np = np.random.rand(*DUMMY_INPUT_SHAPE).astype(np.float32)
@@ -256,3 +257,8 @@ if __name__ == '__main__':
         "TFLite FP16": (tflite_fp16_mean, tflite_fp16_std)
     }
     plot_inference_times(results_for_plot)
+
+    print("\nСохранение эталонного выхода PyTorch...")
+    os.makedirs('./pytorch_outputs', exist_ok=True) 
+    np.save(f'./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy', torch_out) 
+    print(f"Эталонный выход сохранен в ./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy")
