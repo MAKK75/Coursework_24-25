@@ -1,0 +1,5 @@
+openvino-dev[pytorch]>=2023.2
+nncf>=2.8
+transformers
+matplotlib
+numpy
