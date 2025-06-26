@@ -129,7 +129,7 @@ Model-quantization-benchmark/
     ```
 
 ## Итоговые результаты
-
+Пример файорв create_table.py, create_summary_graphs.py для получения таблиц и графиков.
 ![Таблица для Resnet-18](table_resnet18.png)
 ![График для Resnet-18](summary_performance_resnet.png)
 ![Таблица для BERT](table_bert.png)
