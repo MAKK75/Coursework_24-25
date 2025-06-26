@@ -22,13 +22,13 @@ TFLITE_FP32_PATH = 'bert_model_fp32.tflite'
 TFLITE_FP16_PATH = 'bert_model_fp16.tflite'
 DEVICE = torch.device('cpu')
 REPEATS = 20
+MODEL_NAME_FOR_PLOT = 'bert'
 PLOT_FILENAME = 'inference_times_bert_comparison.png' 
 
 # Инициализация токенизатора и входных данных
 tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
-sample_text = "Hello, this is a test input for benchmarking BERT inference!"
-# Используем return_tensors='np' напрямую для numpy_inputs_dict
-numpy_inputs_dict = tokenizer(sample_text, return_tensors='np', padding=True, truncation=True, max_length=128)
+sample_text = "This is a sample sentence for benchmarking the language model inference time and accuracy."
+numpy_inputs_dict = tokenizer(sample_text, return_tensors='np', padding='max_length', truncation=True, max_length=128)
 
 def prepare_torch_inputs(inputs_dict_np):
     return {k: torch.tensor(v).to(DEVICE) for k, v in inputs_dict_np.items()}
@@ -67,8 +67,6 @@ def run_onnx(session, inputs_dict_np, repeats=REPEATS):
 
         if matched_key:
             data = inputs_dict_np[matched_key]
-            # ONNX ожидает int64 для ids/mask, float32 для других float-тензоров
-            # Проверяем тип данных в ONNX модели
             if detail.type == 'tensor(int64)' and data.dtype != np.int64:
                 input_feed[onnx_name] = data.astype(np.int64)
             elif 'float' in detail.type and data.dtype != np.float32: # e.g. 'tensor(float)'
@@ -100,13 +98,10 @@ def run_onnx(session, inputs_dict_np, repeats=REPEATS):
 def run_tflite(interpreter, inputs_dict_np, repeats=REPEATS):
     initial_input_details = interpreter.get_input_details()
 
-    # Сопоставление имен входов TFLite с ключами в numpy_inputs_dict
-    # TFLite часто добавляет префиксы, например, 'serving_default_input_ids:0'
     tflite_input_map = {}
     for detail in initial_input_details:
         tflite_name = detail['name']
         matched_key = None
-        # Ищем точное соответствие или частичное (input_ids в serving_default_input_ids)
         for np_key in inputs_dict_np.keys():
             if np_key == tflite_name or np_key in tflite_name:
                 matched_key = np_key
@@ -120,14 +115,12 @@ def run_tflite(interpreter, inputs_dict_np, repeats=REPEATS):
         print(f"CRITICAL for TFLite: Mismatch in mapped inputs. Expected {len(initial_input_details)}, got {len(tflite_input_map)}. Cannot proceed.")
         return None, np.nan, np.nan
 
-    # Resize inputs, если необходимо (обычно для BERT длина последовательности может меняться)
     for detail in initial_input_details:
         if detail['index'] in tflite_input_map:
             _, data_for_shape = tflite_input_map[detail['index']]
             current_model_shape = list(detail['shape'])
             data_shape = list(data_for_shape.shape)
 
-            # Если модель имеет динамические размеры (-1 или None) или форма не совпадает
             is_dynamic_shape = any(s == -1 or s is None for s in current_model_shape)
             if (is_dynamic_shape and current_model_shape != data_shape) or \
                (not is_dynamic_shape and current_model_shape != data_shape):
@@ -141,7 +134,6 @@ def run_tflite(interpreter, inputs_dict_np, repeats=REPEATS):
                          print(f"Warning TFLite: Resize failed for {detail['name']} to {data_shape}. Error: {e_resize}")
 
     interpreter.allocate_tensors()
-    # Получаем детали после allocate_tensors, так как форма может измениться
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
 
@@ -150,10 +142,8 @@ def run_tflite(interpreter, inputs_dict_np, repeats=REPEATS):
     for detail in input_details:
         if detail['index'] in tflite_input_map:
             np_key, data = tflite_input_map[detail['index']]
-            # Убедимся, что тип данных совпадает с ожидаемым моделью TFLite
             interpreter.set_tensor(detail['index'], data.astype(detail['dtype']))
         else:
-             # Эта ситуация не должна возникнуть, если предыдущее сопоставление прошло успешно
              raise ValueError(f"Error TFLite (warm-up): Data for input '{detail['name']}' (index {detail['index']}) not found in tflite_input_map.")
 
 
@@ -171,7 +161,6 @@ def run_tflite(interpreter, inputs_dict_np, repeats=REPEATS):
 
         start_time = time.perf_counter()
         interpreter.invoke()
-        # Предполагаем, что интересующий выход (last_hidden_state) первый
         out = interpreter.get_tensor(output_details[0]['index'])
         times.append(time.perf_counter() - start_time)
         if not outputs_list:
@@ -331,3 +320,8 @@ if __name__ == '__main__':
         "TFLite FP16": (tflite_fp16_mean, tflite_fp16_std)
     }
     plot_inference_times(results_for_plot, model_name_str=MODEL_NAME)
+    
+    print("\nСохранение эталонного выхода PyTorch...")
+    os.makedirs('./pytorch_outputs', exist_ok=True) 
+    np.save(f'./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy', torch_out) 
+    print(f"Эталонный выход сохранен в ./pytorch_outputs/torch_output_{MODEL_NAME_FOR_PLOT}.npy")
